@@ -1,0 +1,26 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en" class="h-100">
+    <head>
+        <meta charset="utf-8">
+        <title>Удаленная поддержка | {% block title %}{% endblock %}</title>
+        <link rel="stylesheet" type="text/css", href="{% static 'css/style.css' %}">
+    </head>
+    <body>
+        <div class="nav">
+            <div class="nav-home">
+                <a href="#">Главная</a>
+            </div>
+            <div class="nav-cart">
+                {% if cartAmount > 0 %}
+                <a href="#"><img src="{% static 'icon/cart.svg' %}" alt="cart"></a>
+                <div class="nav-cart-count">{{ cartAmount }}</div>
+                {% else %}
+                <a href="#"><img src="{% static 'icon/cart-empty.svg' %}" alt="cart"></a>
+                {% endif %}
+            </div>
+        </div>
+        {% block content %}{% endblock %}
+    </body>
+</html>
