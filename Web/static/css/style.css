@@ -123,20 +123,21 @@ html, body {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    height: 100vh;
+    /* height: 100vh; */
     margin-top: 35px;
-    width: 100%;
+    /* width: 100%; */
     padding-left: 65px;
     /* background-color: gray; */
-    overflow-y: auto;
+    /* overflow-y: auto; */
     flex: 1 1 auto;
+    gap: 80px;
 }
 
 .product-card {
     width: 225px;
     height: 250px;
-    margin-right: 80px;
-    margin-bottom: 80px;
+    /* margin-right: 80px;*/
+    margin-bottom: 10px; 
     background-color: white;
     border-radius: 10px;
     box-shadow: 0 5px 4px rgba(0, 0, 0, 0.25);

@@ -12,8 +12,8 @@
 </div>
 <div class="content">
     {% for item in items %}
-    <a href="{% url 'item' item.id %}">
-        <div class="product-card">
+    <a class="product-card" href="{% url 'item' item.id %}">
+        <div>
             <img class="product-card-img" src="{{ item.image }}">
             <div class="product-card-title">{{ item.name }}</div>
             <div class="product-card-details">
