@@ -10,16 +10,16 @@
     <body>
         <div class="nav">
             <div class="nav-home">
-                <a href="#">Главная</a>
+                <a href="{% url 'index' %}">Главная</a>
             </div>
-            <div class="nav-cart">
-                {% if cartAmount > 0 %}
-                <a href="#"><img src="{% static 'icon/cart.svg' %}" alt="cart"></a>
-                <div class="nav-cart-count">{{ cartAmount }}</div>
-                {% else %}
-                <a href="#"><img src="{% static 'icon/cart-empty.svg' %}" alt="cart"></a>
-                {% endif %}
-            </div>
+            <a href="{% url 'cart' userCartId %}">
+                <div class="nav-cart">
+                    <img src="{% if cartAmount > 0 %}{% static 'icon/cart.svg' %}{% else %}{% static 'icon/cart-empty.svg' %}{% endif %}" alt="cart">
+                    {% if cartAmount > 0 %}
+                    <div class="nav-cart-count">{{ cartAmount }}</div>
+                    {% endif %}
+                </div>
+            </a>
         </div>
         {% block content %}{% endblock %}
     </body>

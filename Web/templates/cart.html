@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Корзина{% endblock %}
+
+{% block content %}
+<div class="header">
+    <span class="header-text">Корзина</span>
+</div>
+<div class="cart-content">
+    {% if cartAmount > 0 %}
+    <ul class="cart-ul">
+        {% for item in items %}
+        <li>{{item.name}}</li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <span>Корзина в данный момент пуста 😢</span>
+    {% endif %}
+</div>
+{% endblock %}

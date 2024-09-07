@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{item.name}}{% endblock %}
+
+{% block content %}
+<div class="header">
+    <span class="header-text">{{item.name}}</span>
+</div>
+<div class="item-content">
+    <div class="item-content-img-bg"></div>
+    <img class="item-content-img" src="{{item.image }}">
+    <span class="item-content-details">{{item.description}}</span>
+</div>
+{% endblock %}

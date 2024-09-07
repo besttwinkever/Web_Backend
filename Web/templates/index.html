@@ -5,22 +5,23 @@
 
 {% block content %}
 <div class="search-bar">
-    <form action="" method="post">
-        {% csrf_token %}
+    <form action="" method="get">
         <input name="search" class="search-bar-input" value="{{ search }}" type="text" placeholder="Введите поисковый запрос">
         <button type="submit" class="search-bar-button">Поиск</button>
     </form>
 </div>
 <div class="content">
     {% for item in items %}
-    <div class="product-card">
-        <img class="product-card-img" src="{{ item.image }}">
-        <div class="product-card-title">{{ item.name }}</div>
-        <div class="product-card-details">
-            <span class="product-card-details-price">{{ item.price }} ₽</span>
-            <a href="#"><button class="product-card-details-button">Подробнее</button></a>
+    <a href="{% url 'item' item.id %}">
+        <div class="product-card">
+            <img class="product-card-img" src="{{ item.image }}">
+            <div class="product-card-title">{{ item.name }}</div>
+            <div class="product-card-details">
+                <span class="product-card-details-price">{{ item.price }} ₽</span>
+                <button class="product-card-details-button">Подробнее</button>
+            </div>
         </div>
-    </div>
+    </a>
     {% endfor %}
 </div>
 {% endblock %}
