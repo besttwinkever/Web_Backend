@@ -65,15 +65,15 @@ html, body {
 
 .appeal-content{
     position: absolute;
-    right: 0;
+    right: 17.75px;
     width: 30px;
     height: 30px;
 }
 
 .appeal-count {
     position: absolute;
-    top: 16px;
-    right: 68px;
+    top: 0;
+    right: -15px;
     width: 24px;
     height: 13px;
     background-color: rgb(204, 0, 0);
@@ -88,9 +88,9 @@ html, body {
 .main-header {
     position: relative;
     margin-top: 96px;
-    padding-left: 369px;
-    width: 530px;
-    height: 30px;
+    margin-left: 35%;
+    width: 844px;
+    height: 31px;
 }
 
 .search-bar {

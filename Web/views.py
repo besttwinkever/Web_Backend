@@ -16,7 +16,7 @@ items = [
     {
         'id': 3,
         'image': 'http://127.0.0.1:9000/images/3.jpg',
-        'name': 'Сбой в утсановке программы',
+        'name': 'Сбой в установке программы',
         'description': 'Во время установки программного обеспечения возникают ошибки, или программа после установки не работает корректно. Это может быть связано с несовместимостью ПО, нехваткой системных ресурсов или конфликтом с другими установленными приложениями.'
     },
     {
@@ -39,7 +39,7 @@ items = [
     }
 ]
 
-cartItemIds = [
+appealItemIds = [
     {
         'id': 1,
         'itemIds': [1, 5, 3]
@@ -54,12 +54,12 @@ cartItemIds = [
     }
 ]
 
-userCartId = 1
+userAppealId = 1
 
-def getCartById(id):
-    for cart in cartItemIds:
-        if cart['id'] == id:
-            return cart
+def getAppealById(id):
+    for appeal in appealItemIds:
+        if appeal['id'] == id:
+            return appeal
     return None
 
 def getItemById(id):
@@ -70,20 +70,20 @@ def getItemById(id):
 
 # Index controller
 def indexController(request):
-    cartAmount = 0
-    cart = getCartById(userCartId)
+    appealAmount = 0
+    cart = getAppealById(userAppealId)
     if cart != None:
-        cartAmount = len(cart['itemIds'])
+        appealAmount = len(cart['itemIds'])
 
     search = ''
-    if 'search' in request.GET:
-        search = request.GET['search']
+    if 'issue_name' in request.GET:
+        search = request.GET['issue_name']
     
     data = {
         'items': [],
-        'cartAmount': cartAmount,
+        'appealAmount': appealAmount,
         'search': search,
-        'userCartId': userCartId
+        'userAppealId': userAppealId
     }
 
     for item in items:
@@ -94,31 +94,24 @@ def indexController(request):
 
 # Item controller
 def itemController(request, id):
-    cartAmount = 0
-    cart = getCartById(userCartId)
-    if cart != None:
-        cartAmount = len(cart['itemIds'])
-
     item = getItemById(id)
     if item == None:
         return redirect('index')
 
     return render(request, 'item.html', {
-        'item': item,
-        'cartAmount': cartAmount,
-        'userCartId': userCartId
+        'item': item
     })
 
-# Shopping cart controller
-def cartController(request, cartId):
-    cart = getCartById(cartId)
+# Appeal controller
+def appealController(request, appealId):
+    cart = getAppealById(appealId)
     if cart == None:
         return redirect('index')
 
     data = {
         'items': [],
         'appealAmount': len(cart['itemIds']),
-        'userAppealId': cartId
+        'userAppealId': appealId
     }
     for id in cart['itemIds']:
         item = getItemById(id)
@@ -127,4 +120,4 @@ def cartController(request, cartId):
                 'name': item['name']
             })
 
-    return render(request, 'cart.html', data)
+    return render(request, 'appeal.html', data)

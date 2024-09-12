@@ -21,6 +21,6 @@ from django.urls import path
 urlpatterns = [
     path('', views.indexController, name='index'),
     path('item/<int:id>/', views.itemController, name='item'),
-    path('cart/<int:cartId>/', views.cartController, name='cart'),
+    path('appeal/<int:appealId>/', views.appealController, name='appeal'),
     path('admin/', admin.site.urls)
 ]
