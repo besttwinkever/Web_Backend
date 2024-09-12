@@ -12,14 +12,6 @@
             <div class="nav-home">
                 <a href="{% url 'index' %}">Главная</a>
             </div>
-            <a href="{% url 'cart' userCartId %}">
-                <div class="nav-cart">
-                    <img src="{% if cartAmount > 0 %}{% static 'icon/cart.svg' %}{% else %}{% static 'icon/cart-empty.svg' %}{% endif %}" alt="cart">
-                    {% if cartAmount > 0 %}
-                    <div class="nav-cart-count">{{ cartAmount }}</div>
-                    {% endif %}
-                </div>
-            </a>
         </div>
         {% block content %}{% endblock %}
     </body>

@@ -63,20 +63,17 @@ html, body {
     mask-size: 100% 100%;
   }
 
-.nav-cart {
-    position: fixed;
-    text-transform: uppercase;
-    top: 16px;
-    right: 85px;
+.appeal-content{
+    position: absolute;
+    right: 17.75px;
     width: 30px;
     height: 30px;
 }
 
-.nav-cart-count {
-    position: fixed;
-    text-transform: uppercase;
-    top: 16px;
-    right: 68px;
+.appeal-count {
+    position: absolute;
+    top: 0;
+    right: -15px;
     width: 24px;
     height: 13px;
     background-color: rgb(204, 0, 0);
@@ -88,10 +85,17 @@ html, body {
     text-align: center;
 }
 
-.search-bar {
+.main-header {
     position: relative;
     margin-top: 96px;
-    padding-left: 65px;
+    margin-left: 35%;
+    width: 844px;
+    height: 31px;
+}
+
+.search-bar {
+    position: absolute;
+    left: 0;
     width: 530px;
     height: 30px;
 }
@@ -204,7 +208,8 @@ button:hover {
 }
 
 .product-card-details-button {
-    right: 10px;
+    left: 10px;
+    width: 204px;
     position: absolute;
 }
 

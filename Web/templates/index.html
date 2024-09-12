@@ -4,11 +4,21 @@
 {% block title %}Главная{% endblock %}
 
 {% block content %}
-<div class="search-bar">
-    <form action="" method="get">
-        <input name="search" class="search-bar-input" value="{{ search }}" type="text" placeholder="Введите поисковый запрос" autocomplete="off">
-        <button type="submit" class="search-bar-button">Поиск</button>
-    </form>
+<div class="main-header">
+    <div class="search-bar">
+        <form action="" method="get">
+            <input name="issue_name" class="search-bar-input" value="{{ search }}" type="text" placeholder="Введите искомое происшествие" autocomplete="off">
+            <button type="submit" class="search-bar-button">Поиск</button>
+        </form>
+    </div>
+    <div class="appeal-content">
+        <a href="{% url 'appeal' userAppealId %}">
+            <img src="{% if appealAmount > 0 %}{% static 'icon/appeal.svg' %}{% else %}{% static 'icon/appeal-empty.svg' %}{% endif %}" alt="cart">
+            {% if appealAmount > 0 %}
+            <div class="appeal-count">{{ appealAmount }}</div>
+            {% endif %}
+        </a>
+    </div>
 </div>
 <div class="content">
     {% for item in items %}
@@ -17,7 +27,6 @@
             <img class="product-card-img" src="{{ item.image }}">
             <div class="product-card-title">{{ item.name }}</div>
             <div class="product-card-details">
-                <span class="product-card-details-price">{{ item.price }} ₽</span>
                 <button class="product-card-details-button">Подробнее</button>
             </div>
         </div>
