@@ -63,18 +63,15 @@ html, body {
     mask-size: 100% 100%;
   }
 
-.nav-cart {
-    position: fixed;
-    text-transform: uppercase;
-    top: 16px;
-    right: 85px;
+.appeal-content{
+    position: absolute;
+    right: 0;
     width: 30px;
     height: 30px;
 }
 
-.nav-cart-count {
-    position: fixed;
-    text-transform: uppercase;
+.appeal-count {
+    position: absolute;
     top: 16px;
     right: 68px;
     width: 24px;
@@ -88,10 +85,17 @@ html, body {
     text-align: center;
 }
 
-.search-bar {
+.main-header {
     position: relative;
     margin-top: 96px;
-    padding-left: 65px;
+    padding-left: 369px;
+    width: 530px;
+    height: 30px;
+}
+
+.search-bar {
+    position: absolute;
+    left: 0;
     width: 530px;
     height: 30px;
 }
@@ -204,7 +208,8 @@ button:hover {
 }
 
 .product-card-details-button {
-    right: 10px;
+    left: 10px;
+    width: 204px;
     position: absolute;
 }
 
