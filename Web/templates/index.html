@@ -12,7 +12,7 @@
         </form>
     </div>
     <div class="appeal-content">
-        <a href="{% url 'appea' userAppealId %}">
+        <a href="{% url 'appeal' userAppealId %}">
             <img src="{% if appealAmount > 0 %}{% static 'icon/appeal.svg' %}{% else %}{% static 'icon/appeal-empty.svg' %}{% endif %}" alt="cart">
             {% if appealAmount > 0 %}
             <div class="appeal-count">{{ appealAmount }}</div>
