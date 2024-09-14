@@ -11,7 +11,7 @@
             <button type="submit" class="search-bar-button">Поиск</button>
         </form>
     </div>
-    <div class="appeal-content">
+    <div class="header-appeal-content">
         <a href="{% url 'appeal' userAppealId %}">
             <img src="{% if appealAmount > 0 %}{% static 'icon/appeal.svg' %}{% else %}{% static 'icon/appeal-empty.svg' %}{% endif %}" alt="cart">
             {% if appealAmount > 0 %}

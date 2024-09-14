@@ -42,15 +42,54 @@ items = [
 appealItemIds = [
     {
         'id': 1,
-        'itemIds': [1, 5, 3]
+        'items': [
+            {
+                'id': 1,
+                'count': 1
+            },
+            {
+                'id': 5,
+                'count': 1
+            },
+            {
+                'id': 3,
+                'count': 2
+            }
+        ]
     },
     {
         'id': 2,
-        'itemIds': [2, 3, 1]
+        'items': [
+            {
+                'id': 2,
+                'count': 3
+            },
+            {
+                'id': 3,
+                'count': 1
+            },
+            {
+                'id': 1,
+                'count': 2
+            }
+        ]
     },
     {
         'id': 3,
-        'itemIds': [1, 6, 2]
+        'items': [
+            {
+                'id': 1,
+                'count': 5
+            },
+            {
+                'id': 6,
+                'count': 1
+            },
+            {
+                'id': 2,
+                'count': 3
+            }
+        ]
     }
 ]
 
@@ -71,9 +110,9 @@ def getItemById(id):
 # Index controller
 def indexController(request):
     appealAmount = 0
-    cart = getAppealById(userAppealId)
-    if cart != None:
-        appealAmount = len(cart['itemIds'])
+    appeal = getAppealById(userAppealId)
+    if appeal != None:
+        appealAmount = len(appeal['items'])
 
     search = ''
     if 'issue_name' in request.GET:
@@ -104,20 +143,20 @@ def itemController(request, id):
 
 # Appeal controller
 def appealController(request, appealId):
-    cart = getAppealById(appealId)
-    if cart == None:
+    appeal = getAppealById(appealId)
+    if appeal == None:
         return redirect('index')
 
     data = {
-        'items': [],
-        'appealAmount': len(cart['itemIds']),
-        'userAppealId': appealId
+        'items': []
     }
-    for id in cart['itemIds']:
-        item = getItemById(id)
+    for itemData in appeal['items']:
+        item = getItemById(itemData['id'])
         if item != None:
             data['items'].append({
-                'name': item['name']
+                'name': item['name'],
+                'image': item['image'],
+                'count': itemData['count']
             })
 
     return render(request, 'appeal.html', data)
