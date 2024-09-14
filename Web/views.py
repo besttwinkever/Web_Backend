@@ -1,162 +1,124 @@
 from django.shortcuts import render, redirect
+from Web.models import Issue, Appeal, AppealIssues
+import psycopg2
 
-items = [
-    {
-        'id': 1,
-        'image': 'http://127.0.0.1:9000/images/1.jpg',
-        'name': 'Удаление или потеря данных',
-        'description': 'Пользователь случайно удалил важные файлы или произошла ошибка в работе системы, приведшая к потере данных. Необходима услуга восстановления удалённых данных с помощью специальных программ и технологий.'
-    },
-    {
-        'id': 2,
-        'image': 'http://127.0.0.1:9000/images/2.jpg',
-        'name': 'Неисправность компьютера',
-        'description': 'Компьютер не включается, зависает или работает с перебоями. Требуется диагностика для выявления аппаратных или программных проблем, которые могут включать перегрев, сбой компонентов или конфликты программного обеспечения.'
-    },
-    {
-        'id': 3,
-        'image': 'http://127.0.0.1:9000/images/3.jpg',
-        'name': 'Сбой в установке программы',
-        'description': 'Во время установки программного обеспечения возникают ошибки, или программа после установки не работает корректно. Это может быть связано с несовместимостью ПО, нехваткой системных ресурсов или конфликтом с другими установленными приложениями.'
-    },
-    {
-        'id': 4,
-        'image': 'http://127.0.0.1:9000/images/4.jpg',
-        'name': 'Обнаружение вредоносного ПО',
-        'description': 'На устройстве обнаружены вирусы, трояны, рекламное ПО или другие вредоносные программы, которые могут угрожать безопасности данных или замедлять работу системы. Необходима услуга по их удалению и защите системы.'
-    },
-    {
-        'id': 5,
-        'image': 'http://127.0.0.1:9000/images/5.jpg',
-        'name': 'Неисправность периферийного устройства',
-        'description': 'Принтер, сканер, веб-камера или другое периферийное устройство не работает, не подключается к компьютеру или работает некорректно. Требуется настройка или устранение неполадок оборудования.'
-    },
-    {
-        'id': 6,
-        'image': 'http://127.0.0.1:9000/images/6.jpg',
-        'name': 'Медленная работа системы',
-        'description': 'Операционная система работает медленно, тормозит при выполнении задач, что может быть вызвано чрезмерным количеством запущенных процессов, накопившимися временными файлами или фрагментацией диска. Требуется оптимизация работы системы для улучшения её производительности.'
-    }
-]
+# Database connection
+conn = psycopg2.connect(
+    dbname='web',
+    user='web_user',
+    password='123123',
+    host='localhost',
+    port=5432
+)
+cur = conn.cursor()
 
-appealItemIds = [
-    {
-        'id': 1,
-        'items': [
-            {
-                'id': 1,
-                'count': 1
-            },
-            {
-                'id': 5,
-                'count': 1
-            },
-            {
-                'id': 3,
-                'count': 2
-            }
-        ]
-    },
-    {
-        'id': 2,
-        'items': [
-            {
-                'id': 2,
-                'count': 3
-            },
-            {
-                'id': 3,
-                'count': 1
-            },
-            {
-                'id': 1,
-                'count': 2
-            }
-        ]
-    },
-    {
-        'id': 3,
-        'items': [
-            {
-                'id': 1,
-                'count': 5
-            },
-            {
-                'id': 6,
-                'count': 1
-            },
-            {
-                'id': 2,
-                'count': 3
-            }
-        ]
-    }
-]
+activeUserId = 1
 
-userAppealId = 1
+def getActiveAppealForUser(userId):
+    return Appeal.objects.filter(client_id=userId, status_id=1).first()
 
-def getAppealById(id):
-    for appeal in appealItemIds:
-        if appeal['id'] == id:
-            return appeal
-    return None
+def deleteAppealForUser(userId):
+    cur.execute('SELECT id FROM appeals WHERE client_id = %s AND status_id = 1 LIMIT 1', (userId,))
+    appealId = cur.fetchone()
+    if appealId != None:
+        cur.execute('UPDATE appeals SET status_id = 2, time_ended=CURRENT_TIMESTAMP WHERE id = %s', (appealId,))
+    conn.commit()
 
-def getItemById(id):
-    for item in items:
-        if item['id'] == id:
-            return item
-    return None
+def addIssueToAppealForUser(userId, issueId, count=1):
+    appeal = getActiveAppealForUser(userId)
+    if appeal == None:
+        appeal = Appeal.objects.create(client_id=userId, status_id=1)
+    AppealIssues.objects.get_or_create(appeal_id=appeal.id, issue_id=issueId, defaults={'count': count})
+
+def getAppealIssuesById(appealId):
+    return AppealIssues.objects.filter(appeal_id=appealId).all()
+
+def getAppealByIdForUser(appealId, userId):
+    return Appeal.objects.get(id=appealId, client_id=userId, status_id=1)
+
+def getIssueById(id):
+    return Issue.objects.get(id=id)
+
+def getIssuesContaining(name):
+    return Issue.objects.filter(name__icontains=name).all()
 
 # Index controller
 def indexController(request):
     appealAmount = 0
-    appeal = getAppealById(userAppealId)
+    userAppealId = -1
+    issuesInCurrentAppeal = []
+    appeal = getActiveAppealForUser(activeUserId)
+
     if appeal != None:
-        appealAmount = len(appeal['items'])
+        issuesInCurrentAppeal = getAppealIssuesById(appeal.id)
+        appealAmount = len(issuesInCurrentAppeal)
+        userAppealId = appeal.id
 
     search = ''
     if 'issue_name' in request.GET:
         search = request.GET['issue_name']
-    
+
     data = {
-        'items': [],
+        'issues': [],
         'appealAmount': appealAmount,
         'search': search,
         'userAppealId': userAppealId
     }
 
-    for item in items:
-        if search.lower() in item['name'].lower():
-            data['items'].append(item)
+    for issue in getIssuesContaining(search):
+        canAdd = True
+        for addedIssue in issuesInCurrentAppeal:
+            if issue.id == addedIssue.issue_id:
+                canAdd = False
+                break
+        data['issues'].append({
+            'data': issue,
+            'canAdd': canAdd
+        })
 
     return render(request, 'index.html', data)
 
-# Item controller
-def itemController(request, id):
-    item = getItemById(id)
-    if item == None:
+# Issue controller
+def issueController(request, id):
+    issue = getIssueById(id)
+    if issue == None:
         return redirect('index')
 
-    return render(request, 'item.html', {
-        'item': item
+    return render(request, 'issue.html', {
+        'issue': issue
     })
+
+def issueAddController(request, id):
+    issue = getIssueById(id)
+    if issue == None:
+        return redirect('index')
+
+    addIssueToAppealForUser(activeUserId, id)
+
+    return redirect('index')
 
 # Appeal controller
 def appealController(request, appealId):
-    appeal = getAppealById(appealId)
+    appeal = getAppealByIdForUser(appealId, activeUserId)
     if appeal == None:
         return redirect('index')
 
+    issues = getAppealIssuesById(appealId)
+
     data = {
-        'items': []
+        'issues': []
     }
-    for itemData in appeal['items']:
-        item = getItemById(itemData['id'])
-        if item != None:
-            data['items'].append({
-                'name': item['name'],
-                'image': item['image'],
-                'count': itemData['count']
+    for issueData in issues:
+        issue = getIssueById(issueData.issue_id)
+        if issue != None:
+            data['issues'].append({
+                'name': issue.name,
+                'image': issue.image,
+                'count': issueData.count
             })
 
     return render(request, 'appeal.html', data)
+
+def appealDeleteController(request):
+    deleteAppealForUser(activeUserId)
+    return redirect('index')

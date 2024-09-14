@@ -20,7 +20,9 @@ from django.urls import path
 
 urlpatterns = [
     path('', views.indexController, name='index'),
-    path('item/<int:id>/', views.itemController, name='item'),
+    path('issue/<int:id>/', views.issueController, name='issue'),
+    path('issue/add/<int:id>/', views.issueAddController, name='issue_add'),
     path('appeal/<int:appealId>/', views.appealController, name='appeal'),
+    path('appeal/delete/', views.appealDeleteController, name='appeal_delete'),
     path('admin/', admin.site.urls)
 ]

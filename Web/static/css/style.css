@@ -111,7 +111,7 @@ html, body {
 
 .product-card {
     width: 225px;
-    height: 250px;
+    height: 270px;
     /* margin-right: 80px;*/
     margin-bottom: 10px; 
     background-color: white;
@@ -122,7 +122,8 @@ html, body {
 .product-card-details {
     position: relative;
     width: 100%;
-    background-color: yellow;
+    height: 59px;
+    /* background-color: yellow; */
 }
 
 .product-card-img {
@@ -139,15 +140,9 @@ html, body {
     margin-left: 10px;
     margin-right: 10px;
     margin-top: 15px;
-    margin-bottom: 15px;
+    margin-bottom: 5px;
     width: 204px;
     height: 81px;
-}
-
-.product-card-details-price {
-    position: absolute;
-    left: 10px;
-    font-size: 18px;
 }
 
 button {
@@ -169,20 +164,17 @@ button:hover {
     transition: 0.3s;
 }
 
-.product-card:hover {
-    cursor: pointer;
-}
-
-.product-card:hover button {
-    background-color: rgb(204, 0, 0);
-    color: white;
-    transition: 0.3s;
-}
-
 .product-card-details-button {
+    bottom: 0;
     left: 10px;
     width: 204px;
-    position: absolute;
+    position: absolute; 
+}
+
+.product-card-add-button {
+    left: 10px;
+    width: 204px;
+    position: absolute; 
 }
 
 .header {
@@ -199,7 +191,7 @@ button:hover {
     text-transform: uppercase;
 }
 
-.item-content {
+.issue-content {
     margin-top: 36px;
     margin-left: 65px;
     position: relative;
@@ -207,7 +199,7 @@ button:hover {
     min-height: 300px;
 }
 
-.item-content-img {
+.issue-content-img {
     position: absolute;
     object-fit: cover;
     width: 462px;
@@ -215,7 +207,7 @@ button:hover {
     left: 0;
 }
 
-.item-content-img-bg {
+.issue-content-img-bg {
     position: absolute;
     width: 462px;
     height: 300px;
@@ -224,7 +216,7 @@ button:hover {
     background-color: rgb(204, 0, 0);
 }
 
-.item-content-details {
+.issue-content-details {
     position: absolute;
     right: 0;
     width: 530px;
@@ -272,7 +264,7 @@ ul li:before {
     flex-direction: column;
     gap: 35px;
     margin-left: 65px;
-    margin-top: 35px;
+    margin-top: 30px;
     margin-bottom: 10px;
 }
 
@@ -309,6 +301,14 @@ ul li:before {
     font-family: circebold;
     text-align: center;
     text-transform: uppercase;
+}
+
+.appeal-delete-button {
+    margin-left: 65px;
+    margin-top: 20px;
+    width: 250px;
+    height: 40px;
+    font-size: 20px;
 }
 
 .appeal-content-details-count {

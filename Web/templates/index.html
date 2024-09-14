@@ -12,7 +12,7 @@
         </form>
     </div>
     <div class="header-appeal-content">
-        <a href="{% url 'appeal' userAppealId %}">
+        <a href="{% if userAppealId == -1 %}# {% else %}{% url 'appeal' userAppealId %} {% endif %}">
             <img src="{% if appealAmount > 0 %}{% static 'icon/appeal.svg' %}{% else %}{% static 'icon/appeal-empty.svg' %}{% endif %}" alt="cart">
             {% if appealAmount > 0 %}
             <div class="appeal-count">{{ appealAmount }}</div>
@@ -21,16 +21,18 @@
     </div>
 </div>
 <div class="content">
-    {% for item in items %}
-    <a class="product-card" href="{% url 'item' item.id %}">
-        <div>
-            <img class="product-card-img" src="{{ item.image }}">
-            <div class="product-card-title">{{ item.name }}</div>
-            <div class="product-card-details">
-                <button class="product-card-details-button">Подробнее</button>
-            </div>
+    {% for issue in issues %}
+    <div class="product-card">
+        <img class="product-card-img" src="{{ issue.data.image }}">
+        <div class="product-card-title">{{ issue.data.name }}</div>
+        <div class="product-card-details">
+            <form method="post" action="{% url 'issue_add' issue.data.id %}">
+                {% csrf_token %}
+                <button {% if not issue.canAdd %} hidden {% endif %} class="product-card-add-button">Добавить</button>
+            </form>
+            <a href="{% url 'issue' issue.data.id %}"><button class="product-card-details-button">Подробнее</button></a>
         </div>
-    </a>
+    </div>
     {% endfor %}
 </div>
 {% endblock %}
