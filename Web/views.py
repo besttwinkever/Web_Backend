@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from Web.models import Issue, Appeal, AppealIssues
 import psycopg2
 
@@ -37,7 +37,10 @@ def getAppealByIdForUser(appealId, userId):
     return Appeal.objects.get(id=appealId, client_id=userId, status_id=1)
 
 def getIssueById(id):
-    return Issue.objects.get(id=id)
+    try:
+        return Issue.objects.get(id=id)
+    except Issue.DoesNotExist:
+        return None
 
 def getIssuesContaining(name):
     return Issue.objects.filter(name__icontains=name).all()
@@ -82,7 +85,7 @@ def indexController(request):
 def issueController(request, id):
     issue = getIssueById(id)
     if issue == None:
-        return redirect('index')
+        return indexController(request)
 
     return render(request, 'issue.html', {
         'issue': issue
@@ -91,17 +94,17 @@ def issueController(request, id):
 def issueAddController(request, id):
     issue = getIssueById(id)
     if issue == None:
-        return redirect('index')
+        return indexController(request)
 
     addIssueToAppealForUser(activeUserId, id)
 
-    return redirect('index')
+    return indexController(request)
 
 # Appeal controller
 def appealController(request, appealId):
     appeal = getAppealByIdForUser(appealId, activeUserId)
     if appeal == None:
-        return redirect('index')
+        return indexController(request)
 
     issues = getAppealIssuesById(appealId)
 
@@ -121,4 +124,4 @@ def appealController(request, appealId):
 
 def appealDeleteController(request):
     deleteAppealForUser(activeUserId)
-    return redirect('index')
+    return indexController(request)

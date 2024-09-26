@@ -26,7 +26,8 @@ class Appeal(models.Model):
         db_table = 'appeals'
 
 class AppealIssues(models.Model):
-    appeal = models.ForeignKey(Appeal, on_delete=models.CASCADE, primary_key=True, db_column='appeal_id')
+    id = models.AutoField(primary_key=True)
+    appeal = models.ForeignKey(Appeal, on_delete=models.CASCADE, db_column='appeal_id')
     issue = models.ForeignKey(Issue, on_delete=models.CASCADE, db_column='issue_id')
     count = models.IntegerField()
 
