@@ -1,5 +1,5 @@
 """
-URL configuration for Web project.
+URL configuration for drf project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/5.1/topics/http/urls/
@@ -14,15 +14,9 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from Web import views
 from django.contrib import admin
 from django.urls import path
 
 urlpatterns = [
-    path('', views.indexController, name='index'),
-    path('issue/<int:id>/', views.issueController, name='issue'),
-    path('issue/add/<int:id>/', views.issueAddController, name='issue_add'),
-    path('appeal/<int:appealId>/', views.appealController, name='appeal'),
-    path('appeal/delete/', views.appealDeleteController, name='appeal_delete'),
-    path('admin/', admin.site.urls)
+    path('admin/', admin.site.urls),
 ]
