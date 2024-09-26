@@ -98,3 +98,96 @@ class IssueAdd(APIView):
         appeal = getActiveAppealForUser(getActiveUserId())
         AppealIssues.objects.get_or_create(appeal_id=appeal.id, issue_id=issue.id, defaults={'count': 1})
         return Response(status=status.HTTP_201_CREATED)
+    
+class AppealList(APIView):
+    model_class = Appeal
+    serializer = AppealSerializer
+
+    def get(self, request):
+        appeals = self.model_class.objects.filter(client_id=getActiveUserId()).exclude(status_id__in=[2]).all() #TODO: поставить нормальные id после тестов (добавить 1)
+        serializer = self.serializer(appeals, many=True)
+        return Response(serializer.data)
+    
+class AppealDetail(APIView):
+    model_class = Appeal
+    serializer = AppealSerializer
+
+    def get(self, request, appeal_id):
+        try:
+            appeal = self.model_class.objects.get(pk=appeal_id, client_id=getActiveUserId())
+        except self.model_class.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        serializer = self.serializer(appeal)
+        issues = AppealIssues.objects.filter(appeal_id=appeal.id).all()
+        issues_serializer = AppealIssuesSerializer(issues, many=True)
+        return Response({
+            'appeal': serializer.data,
+            'issues': issues_serializer.data
+        })
+
+    def put(self, request, appeal_id):
+        try:
+            appeal = self.model_class.objects.get(pk=appeal_id, client_id=getActiveUserId())
+        except self.model_class.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        serializer = self.serializer(appeal, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self, request, appeal_id):
+        try:
+            appeal = self.model_class.objects.get(pk=appeal_id, client_id=getActiveUserId())
+        except self.model_class.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        
+        if appeal.status_id != 1:
+            return Response({"error": "Некорректное обращение"}, status=status.HTTP_400_BAD_REQUEST)
+
+        appeal.status_id = 2
+        appeal.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+class AppealConfirm(APIView):
+    model_class = Appeal
+    serializer = AppealSerializer
+
+    def put(self, request, appeal_id):
+        try:
+            appeal = self.model_class.objects.get(pk=appeal_id, client_id=getActiveUserId())
+        except self.model_class.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        
+        if appeal.status_id != 1:
+            return Response({"error": "Некорректное обращение"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if len(appeal.connection_code) == 0:
+            return Response({"error": "Код подключения не указан."})
+
+        appeal.status_id = 3
+        appeal.save()
+        serializer = self.serializer(appeal)
+        return Response(serializer.data)
+    
+class AppealFinish(APIView):
+    model_class = Appeal
+    serializer = AppealSerializer
+
+    def put(self, request, appeal_id):
+        try:
+            appeal = self.model_class.objects.get(pk=appeal_id)
+        except self.model_class.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        
+        if appeal.status_id != 3:
+            return Response({"error": "Некорректное обращение"}, status=status.HTTP_400_BAD_REQUEST)
+
+        apply = request.data.get('apply')
+        if apply == None:
+            return Response({"error": "Не указано решение по обращению."})
+
+        appeal.status_id = apply and 5 or 4
+        appeal.save()
+        serializer = self.serializer(appeal)
+        return Response(serializer.data)
