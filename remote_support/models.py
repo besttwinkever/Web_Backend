@@ -5,7 +5,7 @@ class Issue(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=64)
     description = models.CharField(max_length=300)
-    image = models.CharField(max_length=64)
+    image = models.CharField(max_length=64, default='http://127.0.0.1:9000/images/default.jpg')
     is_active = models.BooleanField(default=True)
 
     class Meta:
@@ -13,6 +13,7 @@ class Issue(models.Model):
         db_table = 'issues'
 
 class Appeal(models.Model):
+    id = models.AutoField(primary_key=True)
     client = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, db_column='client_id', related_name='client_id')
     helper = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, db_column='helper_id', related_name='helper_id')
     status_id = models.IntegerField()
