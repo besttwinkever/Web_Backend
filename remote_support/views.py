@@ -1,9 +1,12 @@
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
-from remote_support.serializers import AppealSerializer, AppealIssuesSerializer, IssueSerializer
+from remote_support.serializers import AppealSerializer, AppealIssuesSerializer, IssueSerializer, UserSerializer
 from remote_support.models import Appeal, AppealIssues, Issue
 import remote_support.minio as minio
+from datetime import datetime
+from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import check_password
 
 def getActiveUserId():
     return 1
@@ -165,6 +168,7 @@ class AppealConfirm(APIView):
         if len(appeal.connection_code) == 0:
             return Response({"error": "Код подключения не указан."})
 
+        appeal.time_applied = datetime.now()
         appeal.status_id = 3
         appeal.save()
         serializer = self.serializer(appeal)
@@ -187,7 +191,63 @@ class AppealFinish(APIView):
         if apply == None:
             return Response({"error": "Не указано решение по обращению."})
 
+        appeal.helper_id = getActiveUserId()
+        appeal.time_ended = datetime.now()
         appeal.status_id = apply and 5 or 4
         appeal.save()
         serializer = self.serializer(appeal)
         return Response(serializer.data)
+    
+class AppealRemoveIssue(APIView):
+    model_class = AppealIssues
+    serializer = AppealIssuesSerializer
+
+    def delete(self, request, appeal_id, issue_id):
+        try:
+            appeal_issue = AppealIssues.objects.get(appeal_id=appeal_id, issue_id=issue_id)
+        except AppealIssues.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        appeal_issue.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+class UserDetail(APIView):
+    model_class = get_user_model()
+    serializer = UserSerializer
+
+    def put(self, request):
+        user = get_user_model().objects.get(pk=getActiveUserId())
+        return Response(self.serializer(user).data)
+    
+class UserRegister(APIView):
+    model_class = get_user_model()
+    serializer = UserSerializer
+
+    def post(self, request):
+        if not request.data.get('username') or not request.data.get('password') or not request.data.get('email'):
+            return Response({"error": "Не указаны данные для регистрации"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if self.model_class.objects.filter(username=request.data.get('username')).exists() or self.model_class.objects.filter(email=request.data.get('email')).exists():
+            return Response({"error": "Пользователь с таким именем/почтой уже существует"}, status=status.HTTP_400_BAD_REQUEST)
+
+        user = self.model_class.objects.create_user(username=request.data.get('username'), password=request.data.get('password'), email=request.data.get('email'))
+        return Response(self.serializer(user).data)
+    
+class UserLogin(APIView):
+    model_class = get_user_model()
+    serializer = UserSerializer
+
+    def post(self, request):
+        if not request.data.get('username') or not request.data.get('password'):
+            return Response({"error": "Не указаны данные для авторизации"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            user = self.model_class.objects.get(username=request.data.get('username'))
+        except self.model_class.DoesNotExist:
+            return Response({"error": "Неверный логин или пароль"}, status=status.HTTP_400_BAD_REQUEST)
+        if not check_password(request.data.get('password'), user.password):
+            return Response({"error": "Неверный логин или пароль"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(self.serializer(user).data)
+    
+class UserLogout(APIView):
+    def post(self, request):
+        return Response(status=status.HTTP_204_NO_CONTENT)

@@ -24,8 +24,11 @@ class IssueSerializer(serializers.ModelSerializer):
 
 class AppealIssuesSerializer(serializers.ModelSerializer):
     issue_id = serializers.IntegerField()
-    appeal_id = serializers.IntegerField()
-
     class Meta:
         model = AppealIssues
-        fields = ['id', 'appeal_id', 'issue_id', 'count']
+        fields = ['issue_id', 'count']
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = get_user_model()
+        fields = ['id', 'username', 'email', 'first_name', 'last_name']
