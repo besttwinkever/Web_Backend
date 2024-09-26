@@ -26,6 +26,7 @@ urlpatterns = [
 
     path('appeals/', views.AppealList.as_view(), name='appeal-list'),
     path('appeals/<int:appeal_id>/remove/<int:issue_id>', views.AppealRemoveIssue.as_view(), name='appeal-remove-issue'),
+    path('appeals/<int:appeal_id>/edit/<int:issue_id>', views.AppealEditIssue.as_view(), name='appeal-edit-issue'),
     path('appeals/<int:appeal_id>/', views.AppealDetail.as_view(), name='appeal-detail'),
     path('appeals/<int:appeal_id>/confirm', views.AppealConfirm.as_view(), name='appeal-confirm'),
     path('appeals/<int:appeal_id>/finish', views.AppealFinish.as_view(), name='appeal-finish'),

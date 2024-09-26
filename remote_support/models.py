@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.core.validators import MinValueValidator
 
 class Issue(models.Model):
     id = models.AutoField(primary_key=True)
@@ -30,7 +31,7 @@ class AppealIssues(models.Model):
     id = models.AutoField(primary_key=True)
     appeal = models.ForeignKey(Appeal, on_delete=models.CASCADE, db_column='appeal_id')
     issue = models.ForeignKey(Issue, on_delete=models.CASCADE, db_column='issue_id')
-    count = models.IntegerField()
+    count = models.IntegerField(validators=[MinValueValidator(1)])
 
     class Meta:
         managed = False

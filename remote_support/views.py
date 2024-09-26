@@ -24,7 +24,10 @@ class IssueList(APIView):
     serializer = IssueSerializer
 
     def get(self, request):
-        issues = self.model_class.objects.filter(is_active=True).all()
+        search = ''
+        if 'issue_name' in request.GET:
+            search = request.GET['issue_name']
+        issues = self.model_class.objects.filter(is_active=True, name__icontains=search).all()
         serializer = self.serializer(issues, many=True)
         return Response({
             'active_appeal_id': getActiveAppealForUser(getActiveUserId()).id,
@@ -107,7 +110,21 @@ class AppealList(APIView):
     serializer = AppealSerializer
 
     def get(self, request):
-        appeals = self.model_class.objects.filter(client_id=getActiveUserId()).exclude(status_id__in=[2]).all() #TODO: поставить нормальные id после тестов (добавить 1)
+        status = None; min_time_applied = None; max_time_applied = None
+        if 'status' in request.GET:
+            status = int(request.GET['issue_name'])
+        if 'min_time_applied' in request.GET:
+            min_time_applied = datetime.fromisoformat(request.GET['min_time_applied'])
+        if 'max_time_applied' in request.GET:
+            max_time_applied = datetime.fromisoformat(request.GET['max_time_applied'])
+
+        appeals = self.model_class.objects.filter(client_id=getActiveUserId()).exclude(status_id__in=[1, 2]).all()
+
+        if status != None:
+            appeals = appeals.filter(status_id=status)
+        if min_time_applied != None and max_time_applied != None:
+            appeals = appeals.filter(time_applied__range=[min_time_applied, max_time_applied])
+
         serializer = self.serializer(appeals, many=True)
         return Response(serializer.data)
     
@@ -210,6 +227,21 @@ class AppealRemoveIssue(APIView):
         appeal_issue.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
+class AppealEditIssue(APIView):
+    model_class = AppealIssues
+    serializer = AppealIssuesSerializer
+
+    def put(self, request, appeal_id, issue_id):
+        try:
+            appeal_issue = AppealIssues.objects.get(appeal_id=appeal_id, issue_id=issue_id)
+        except AppealIssues.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        serializer = self.serializer(appeal_issue, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 class UserDetail(APIView):
     model_class = get_user_model()
     serializer = UserSerializer
