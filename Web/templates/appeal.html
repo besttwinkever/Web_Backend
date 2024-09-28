@@ -9,7 +9,7 @@
 </div>
 <form method="post" action="{% url 'appeal_delete' %}">
     {% csrf_token %}
-    <button class="appeal-delete-button">Удалить</button>
+    <button class="appeal-delete-button">Отменить</button>
 </form>
 <div class="appeal-list-content">
     {% for issue in issues %}
@@ -17,6 +17,7 @@
         <img class="appeal-content-img" src="{{issue.image}}" alt="appealImg">
         <div class="appeal-content-details">
             <div class="appeal-content-details-header">{{issue.name}}</div>
+            <div class="appeal-content-separator">{{issue.description}}</div>
             <div class="appeal-content-details-count">
                 <div>Количество</div>
                 <input class="appeal-content-details-count-input" type="number" value="{{issue.count}}">

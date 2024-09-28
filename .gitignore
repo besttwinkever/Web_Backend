@@ -1,2 +1,3 @@
 Web/__pycache__/*
 db.sqlite3
+Web/migrations/__pycache__/__init__.cpython-310.pyc

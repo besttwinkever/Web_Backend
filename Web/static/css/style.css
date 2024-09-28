@@ -269,8 +269,11 @@ ul li:before {
 }
 
 .appeal-content {
-    position: relative;
-    width: 621px;
+    /* position: relative; */
+    display: flex;
+    flex-direction: row;
+    gap: 25px;
+    width: 687px;
     height: 168px;
     background-color: #fafafa;
     border-radius: 10px;
@@ -278,26 +281,36 @@ ul li:before {
 }
 
 .appeal-content-img {
-    position: absolute;
+    /* position: absolute; */
     width: 189px;
     height: 168px;
     object-fit: cover;
     border-top-left-radius: 10px;
     border-bottom-left-radius: 10px;
-    left: 0;
+    /* left: 0; */
+}
+
+.appeal-content-separator {
+    margin-top: 7px;
+    width: 3px;
+    height: 154px;
+    background-color: #d9d9d9;
 }
 
 .appeal-content-details {
-    position: absolute;
-    right: 0;
-    width: 432px;
+    display: flex;
+    flex-direction: row;
+    gap: 25px;
+    /* position: absolute; */
+    /* left: 214px;
+    width: 687px; */
     height: 168px;
-    padding-top: 30px;
 }
 
 .appeal-content-details-header {
-    font-size: 18px;
-    width: 432px;
+    margin-top: 49px;
+    font-size: 24px;
+    width: 284px;
     font-family: circebold;
     text-align: center;
     text-transform: uppercase;
@@ -312,9 +325,9 @@ ul li:before {
 }
 
 .appeal-content-details-count {
-    margin-top: 10px;
+    margin-top: 45px;
     font-size: 18px;
-    width: 432px;
+    /* width: 432px; */
     font-family: circeregular;
     text-align: center;
 }

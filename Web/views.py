@@ -43,7 +43,7 @@ def getIssueById(id):
         return None
 
 def getIssuesContaining(name):
-    return Issue.objects.filter(name__icontains=name).all()
+    return Issue.objects.filter(name__icontains=name, is_active=True).all()
 
 # Index controller
 def indexController(request):
