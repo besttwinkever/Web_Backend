@@ -22,15 +22,14 @@ urlpatterns = [
     path('issues/', views.IssueList.as_view(), name='issue-list'),
     path('issues/<int:issue_id>/', views.IssueDetail.as_view(), name='issue-detail'),
     path('issues/<int:issue_id>/image', views.IssueImage.as_view(), name='issue-image'),
-    path('issues/<int:issue_id>/add', views.IssueAdd.as_view(), name='issue-add-to-appeal'),
 
     path('appeals/', views.AppealList.as_view(), name='appeal-list'),
-    path('appeals/<int:appeal_id>/remove/<int:issue_id>', views.AppealRemoveIssue.as_view(), name='appeal-remove-issue'),
-    path('appeals/<int:appeal_id>/edit/<int:issue_id>', views.AppealEditIssue.as_view(), name='appeal-edit-issue'),
     path('appeals/<int:appeal_id>/', views.AppealDetail.as_view(), name='appeal-detail'),
     path('appeals/<int:appeal_id>/confirm', views.AppealConfirm.as_view(), name='appeal-confirm'),
     path('appeals/<int:appeal_id>/finish', views.AppealFinish.as_view(), name='appeal-finish'),
     
+    path('appeal_issues/<int:issue_id>/', views.AppealIssuesEdit.as_view(), name='appeal-issues'),
+
     path('user/', views.UserDetail.as_view(), name='user-detail'),
     path('user/register', views.UserRegister.as_view(), name='user-register'),
     path('user/login', views.UserLogin.as_view(), name='user-login'),

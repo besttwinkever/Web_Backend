@@ -92,19 +92,6 @@ class IssueImage(APIView):
             return image_result
         return Response(serializer.data)
     
-class IssueAdd(APIView):
-    model_class = AppealIssues
-    serializer = AppealIssuesSerializer
-
-    def post(self, request, issue_id):
-        try:
-            issue = Issue.objects.get(pk=issue_id, is_active=True)
-        except Issue.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        appeal = getActiveAppealForUser(getActiveUserId())
-        AppealIssues.objects.get_or_create(appeal_id=appeal.id, issue_id=issue.id, defaults={'count': 1})
-        return Response(status=status.HTTP_201_CREATED)
-    
 class AppealList(APIView):
     model_class = Appeal
     serializer = AppealSerializer
@@ -216,11 +203,12 @@ class AppealFinish(APIView):
         serializer = self.serializer(appeal)
         return Response(serializer.data)
     
-class AppealRemoveIssue(APIView):
+class AppealIssuesEdit(APIView):
     model_class = AppealIssues
     serializer = AppealIssuesSerializer
 
-    def delete(self, request, appeal_id, issue_id):
+    def delete(self, request, issue_id):
+        appeal_id = getActiveAppealForUser(getActiveUserId()).id
         try:
             appeal_issue = AppealIssues.objects.get(appeal_id=appeal_id, issue_id=issue_id)
         except AppealIssues.DoesNotExist:
@@ -228,11 +216,8 @@ class AppealRemoveIssue(APIView):
         appeal_issue.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
-class AppealEditIssue(APIView):
-    model_class = AppealIssues
-    serializer = AppealIssuesSerializer
-
-    def put(self, request, appeal_id, issue_id):
+    def put(self, request, issue_id):
+        appeal_id = getActiveAppealForUser(getActiveUserId()).id
         try:
             appeal_issue = AppealIssues.objects.get(appeal_id=appeal_id, issue_id=issue_id)
         except AppealIssues.DoesNotExist:
@@ -242,6 +227,16 @@ class AppealEditIssue(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def post(self, request, issue_id):
+        try:
+            issue = Issue.objects.get(pk=issue_id, is_active=True)
+        except Issue.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        appeal = getActiveAppealForUser(getActiveUserId())
+        AppealIssues.objects.get_or_create(appeal_id=appeal.id, issue_id=issue.id, defaults={'count': 1})
+        return Response(status=status.HTTP_201_CREATED)
+    
 
 class UserDetail(APIView):
     model_class = get_user_model()
