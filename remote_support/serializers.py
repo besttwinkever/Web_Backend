@@ -13,7 +13,7 @@ class AppealSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Appeal
-        fields = ['id', 'client', 'helper', 'status_id', 'time_created', 'time_applied', 'time_ended', 'connection_code']
+        fields = ['id', 'client', 'helper', 'status_id', 'time_created', 'time_applied', 'time_ended', 'connection_code', 'average_work_time']
 
 class IssueSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)

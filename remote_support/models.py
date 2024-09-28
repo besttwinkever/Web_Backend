@@ -22,6 +22,7 @@ class Appeal(models.Model):
     time_applied = models.DateTimeField()
     time_ended = models.DateTimeField()
     connection_code = models.CharField(max_length=64)
+    average_work_time = models.IntegerField(default=0)
 
     class Meta:
         managed = False

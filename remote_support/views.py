@@ -112,7 +112,7 @@ class AppealList(APIView):
     def get(self, request):
         status = None; min_time_applied = None; max_time_applied = None
         if 'status' in request.GET:
-            status = int(request.GET['issue_name'])
+            status = int(request.GET['status'])
         if 'min_time_applied' in request.GET:
             min_time_applied = datetime.fromisoformat(request.GET['min_time_applied'])
         if 'max_time_applied' in request.GET:
@@ -211,6 +211,7 @@ class AppealFinish(APIView):
         appeal.helper_id = getActiveUserId()
         appeal.time_ended = datetime.now()
         appeal.status_id = apply and 5 or 4
+        appeal.average_work_time = 10 * AppealIssues.objects.filter(appeal_id=appeal.id).count()
         appeal.save()
         serializer = self.serializer(appeal)
         return Response(serializer.data)
