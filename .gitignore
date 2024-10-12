@@ -1,2 +1,4 @@
 drf/__pycache__/*
+remote_support/__pycache__/*
+remote_support/migrations/__pycache__/*
 db.sqlite3
