@@ -38,12 +38,15 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'drf_yasg',
-    
+
     # drf
     'rest_framework',
 
     # app
-    'remote_support'
+    'remote_support',
+
+    # cors fix for tauri
+    'corsheaders'
 ]
 
 REST_FRAMEWORK = {
@@ -63,12 +66,11 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware'
     # 'remote_support.middleware.CORSMiddleware',
 ]
 
-CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:8000',
-]
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'drf.urls'
 
