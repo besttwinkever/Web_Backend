@@ -28,10 +28,18 @@ class AppealSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     
+    error = serializers.CharField(default=None)
+
     class Meta:
         model = get_user_model()
-        fields = ['username', 'email', 'first_name', 'last_name', 'is_staff', 'is_superuser']
+        fields = ['error', 'username', 'email', 'first_name', 'last_name', 'is_staff', 'is_superuser']
         read_only_fields = ['username', 'email', 'is_staff', 'is_superuser']
+
+class AppealFinishSerializer(serializers.Serializer):
+    apply = serializers.BooleanField()
+
+    class Meta:
+        fields = ['apply']
 
 class UserLoginSerializer(serializers.Serializer):
     username = serializers.CharField()

@@ -231,7 +231,7 @@ class AppealFinish(APIView):
 
     permission_classes = [IsHelper]
 
-    @swagger_auto_schema(request_body=AppealSerializer)
+    @swagger_auto_schema(request_body=AppealFinishSerializer)
     def put(self, request, appeal_id):
         user = getUserBySessionId(request)
         try:
@@ -318,7 +318,7 @@ class UserRegister(APIView):
 
     permission_classes = [permissions.AllowAny]
 
-    @swagger_auto_schema(request_body=UserLoginSerializer)
+    @swagger_auto_schema(request_body=UserRegisterSerializer)
     def post(self, request):
         if not request.data.get('password') or not request.data.get('email'):
             return Response({"status": "Не указаны данные для регистрации"}, status=status.HTTP_400_BAD_REQUEST)
@@ -345,7 +345,7 @@ class UserLogin(APIView):
 
     permission_classes = [permissions.AllowAny]
 
-    @swagger_auto_schema(request_body=UserLoginSerializer)
+    @swagger_auto_schema(request_body=UserLoginSerializer, responses={200: UserSerializer})
     def post(self, request):
         if not request.data.get('username') or not request.data.get('password'):
             return Response({"error": "Не указаны данные для авторизации"}, status=status.HTTP_400_BAD_REQUEST)
