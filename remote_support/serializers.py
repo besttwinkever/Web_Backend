@@ -3,18 +3,48 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from collections import OrderedDict
 
+class IssuesResponseSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    description = serializers.CharField()
+    image = serializers.CharField()
+
+class IssueListSerializer(serializers.Serializer):
+    issue_name = serializers.CharField()
+
 class IssueSerializer(serializers.ModelSerializer):
     class Meta:
         model = Issue
         fields = ['id', 'name', 'description', 'image']
         read_only_fields = ['id', 'image']
 
+class AppealIssueEditSerializer(serializers.Serializer):
+    count = serializers.IntegerField()
+
+class AppealEditSerializer(serializers.Serializer):
+    connection_code = serializers.CharField()
 
 class AppealIssuesSerializer(serializers.ModelSerializer):
+    
+    issue = IssueSerializer()
+    
     class Meta:
         model = AppealIssues
         fields = ['issue', 'count']
         read_only_fields = ['issue']
+
+class ActiveAppealSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    count = serializers.IntegerField()
+
+class AppealIssuesAddResponseSerializer(serializers.Serializer):
+    active_appeal = ActiveAppealSerializer()
+    appeal_issues = AppealIssuesSerializer(many=True)
+
+class IssueListResponseSerializer(serializers.Serializer):
+    active_appeal = ActiveAppealSerializer()
+    issues = IssuesResponseSerializer(many=True)
+    appeal_issues = AppealIssuesSerializer(many=True)
 
 class AppealSerializer(serializers.ModelSerializer):
     issues = AppealIssuesSerializer(many=True, read_only=True)

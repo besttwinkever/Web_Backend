@@ -36,6 +36,7 @@ class IssueList(APIView):
     model_class = Issue
     serializer = IssueSerializer
 
+    @swagger_auto_schema(query_serializer=IssueListSerializer, responses={200: IssueListResponseSerializer})
     def get(self, request):
         search = ''
         if 'issue_name' in request.GET:
@@ -43,12 +44,17 @@ class IssueList(APIView):
         issues = self.model_class.objects.filter(is_active=True, name__icontains=search).all()
         serializer = self.serializer(issues, many=True)
         appeal = getActiveAppealForUser(request, False)
+        try:
+            appealIssuesData = AppealIssuesSerializer(AppealIssues.objects.filter(appeal_id=appeal.id).all(), many=True).data
+        except Exception:
+            appealIssuesData = []
         return Response({
             'active_appeal': {
                 'id': appeal.id if appeal != None else None,
                 'count': AppealIssues.objects.filter(appeal_id=appeal.id).count() if appeal != None else 0
             },
-            'issues': serializer.data
+            'issues': serializer.data,
+            'appeal_issues': appealIssuesData
         })
     
     @swagger_auto_schema(request_body=IssueSerializer)
@@ -64,6 +70,7 @@ class IssueDetail(APIView):
     model_class = Issue
     serializer = IssueSerializer
 
+    @swagger_auto_schema(responses={200: IssueSerializer})
     def get(self, request, issue_id):
         try:
             issue = self.model_class.objects.get(pk=issue_id, is_active=True)
@@ -122,6 +129,7 @@ class AppealList(APIView):
     serializer = AppealSerializer
 
     permission_classes = [IsAuthenticated]
+    @swagger_auto_schema(responses={200: AppealSerializer(many=True)})
     def get(self, request):
         status = None; min_time_applied = None; max_time_applied = None
         if 'status' in request.GET:
@@ -158,6 +166,7 @@ class AppealDetail(APIView):
 
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(responses={200: AppealSerializer})
     def get(self, request, appeal_id):
         user = getUserBySessionId(request)
         try:
@@ -169,7 +178,7 @@ class AppealDetail(APIView):
         serializer = self.serializer(appeal)
         return Response(serializer.data)
         
-    @swagger_auto_schema(request_body=AppealSerializer)
+    @swagger_auto_schema(request_body=AppealEditSerializer)
     def put(self, request, appeal_id):
         user = getUserBySessionId(request)
         try:
@@ -271,7 +280,7 @@ class AppealIssuesEdit(APIView):
         appeal_issue.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
-    @swagger_auto_schema(request_body=AppealIssuesSerializer)
+    @swagger_auto_schema(request_body=AppealIssueEditSerializer, responses={200: AppealIssuesSerializer})
     def put(self, request, issue_id):
         appeal_id = getActiveAppealForUser(request).id
         try:
@@ -284,7 +293,8 @@ class AppealIssuesEdit(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    def post(self, request, issue_id):
+    @swagger_auto_schema(responses={200: AppealIssuesAddResponseSerializer})
+    def post(self, request, issue_id: int):
         try:
             issue = Issue.objects.get(pk=issue_id, is_active=True)
         except Issue.DoesNotExist:
@@ -294,7 +304,13 @@ class AppealIssuesEdit(APIView):
 
         serializer = self.serializer(AppealIssues.objects.filter(appeal_id=appeal.id).all(), many=True)
 
-        return Response(serializer.data)
+        return Response({
+            'active_appeal': {
+                'id': appeal.id,
+                'count': AppealIssues.objects.filter(appeal_id=appeal.id).count() if appeal != None else 0
+            },
+            'appeal_issues': serializer.data
+        })
     
 
 class UserDetail(APIView):
