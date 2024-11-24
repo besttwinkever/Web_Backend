@@ -63,7 +63,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = ['error', 'username', 'email', 'first_name', 'last_name', 'is_staff', 'is_superuser']
-        read_only_fields = ['username', 'email', 'is_staff', 'is_superuser']
+        read_only_fields = ['error', 'is_staff', 'is_superuser']
 
 class AppealFinishSerializer(serializers.Serializer):
     apply = serializers.BooleanField()

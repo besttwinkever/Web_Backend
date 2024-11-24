@@ -319,7 +319,7 @@ class UserDetail(APIView):
 
     permission_classes = [IsAuthenticated]
 
-    @swagger_auto_schema(request_body=UserSerializer)
+    @swagger_auto_schema(request_body=UserSerializer, responses={200: UserSerializer})
     def put(self, request):
         user = getUserBySessionId(request)
         serializer = self.serializer(user, data=request.data, partial=True)
