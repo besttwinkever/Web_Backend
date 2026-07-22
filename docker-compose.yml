@@ -1,0 +1,92 @@
+services:
+  web-postgres:
+    image: postgres:17.5
+    container_name: web-postgres
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - default
+
+  web-minio:
+    image: minio/minio:latest
+    container_name: web-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
+    volumes:
+      - minio_data:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - default
+
+  web-minio-init:
+    image: minio/mc:latest
+    container_name: web-minio-init
+    depends_on:
+      web-minio:
+        condition: service_healthy
+    volumes:
+      - ./seed:/seed:ro
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://web-minio:9000 ${MINIO_ACCESS_KEY} ${MINIO_SECRET_KEY} &&
+      mc mb -p local/images &&
+      mc anonymous set download local/images &&
+      mc cp /seed/default.jpg local/images/default.jpg &&
+      mc cp /seed/issues/1.jpg /seed/issues/2.jpg /seed/issues/3.jpg /seed/issues/4.jpg /seed/issues/5.jpg /seed/issues/6.jpg local/images/
+      "
+    networks:
+      - default
+
+  web-backend:
+    build:
+      dockerfile: Dockerfile
+    container_name: web-backend
+    depends_on:
+      web-postgres:
+        condition: service_healthy
+      web-minio-init:
+        condition: service_completed_successfully
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=${DEBUG}
+      - SECRET_KEY=${SECRET_KEY}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=web-postgres
+      - DB_PORT=5432
+      - MINIO_ENDPOINT=web-minio:9000
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+      - MINIO_USE_SSL=False
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
+    networks:
+      - default
+
+volumes:
+  postgres_data:
+  minio_data:
+
+networks:
+  default:

@@ -10,20 +10,18 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import os
 from pathlib import Path
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+load_dotenv(BASE_DIR / '.env')
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
+SECRET_KEY = os.environ.get('SECRET_KEY', '')
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-qn#3+%y3%3ya%imc670!&^rdk_@ve!@utt2%3*11^@eztrf4gc'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = ['*']
 
@@ -37,15 +35,17 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+
     # drf
     'rest_framework',
+    'corsheaders',
 
     # app
     'remote_support'
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -82,11 +82,11 @@ WSGI_APPLICATION = 'drf.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'web', # Имя вашей БД. Если вы создали черезе psql или IDE свою базу и хотите использовать его - пропишите его имя здесь
-        'USER': 'web_user',
-        'PASSWORD': '123123',
-        'HOST': 'localhost',
-        'PORT': 5432, # Стандартный порт PostgreSQL
+        'NAME': os.environ.get('DB_NAME', 'web'),
+        'USER': os.environ.get('DB_USER', 'web_user'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', '123123'),
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'PORT': os.environ.get('DB_PORT', '5432'),
     }
 }
 
@@ -133,7 +133,12 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AWS_STORAGE_BUCKET_NAME = 'images'
-AWS_ACCESS_KEY_ID = 'minio'
-AWS_SECRET_ACCESS_KEY = 'minio124'
-AWS_S3_ENDPOINT_URL = 'localhost:9000'
-MINIO_USE_SSL = False
+AWS_ACCESS_KEY_ID = os.environ.get('MINIO_ACCESS_KEY', 'minio')
+AWS_SECRET_ACCESS_KEY = os.environ.get('MINIO_SECRET_KEY', 'minio124')
+AWS_S3_ENDPOINT_URL = os.environ.get('MINIO_ENDPOINT', 'localhost:9000')
+MINIO_USE_SSL = os.environ.get('MINIO_USE_SSL', 'False') == 'True'
+
+CORS_ALLOW_ALL_ORIGINS = DEBUG
+CORS_ALLOWED_ORIGINS = [
+    origin for origin in os.environ.get('CORS_ALLOWED_ORIGINS', '').split(',') if origin
+]

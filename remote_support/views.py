@@ -9,7 +9,14 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import check_password
 
 def getActiveUserId():
-    return 1
+    user, created = get_user_model().objects.get_or_create(
+        username='demo',
+        defaults={'email': 'demo@example.com'},
+    )
+    if created:
+        user.set_password('demo')
+        user.save()
+    return user.id
 
 def getActiveAppealForUser(userId):
     appeal = None
@@ -29,9 +36,15 @@ class IssueList(APIView):
             search = request.GET['issue_name']
         issues = self.model_class.objects.filter(is_active=True, name__icontains=search).all()
         serializer = self.serializer(issues, many=True)
+
+        appeal = getActiveAppealForUser(getActiveUserId())
+        appeal_issues = AppealIssues.objects.filter(appeal_id=appeal.id).select_related('issue')
+        appeal_issues_data = AppealIssuesSerializer(appeal_issues, many=True).data
+
         return Response({
-            'active_appeal_id': getActiveAppealForUser(getActiveUserId()).id,
-            'issues': serializer.data
+            'active_appeal': {'id': appeal.id, 'count': len(appeal_issues_data)},
+            'issues': serializer.data,
+            'appeal_issues': appeal_issues_data
         })
     
     def post(self, request):
@@ -125,12 +138,7 @@ class AppealDetail(APIView):
         except self.model_class.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
         serializer = self.serializer(appeal)
-        issues = AppealIssues.objects.filter(appeal_id=appeal.id).all()
-        issues_serializer = AppealIssuesSerializer(issues, many=True)
-        return Response({
-            'appeal': serializer.data,
-            'issues': issues_serializer.data
-        })
+        return Response(serializer.data)
 
     def put(self, request, appeal_id):
         try:
@@ -235,7 +243,13 @@ class AppealIssuesEdit(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
         appeal = getActiveAppealForUser(getActiveUserId())
         AppealIssues.objects.get_or_create(appeal_id=appeal.id, issue_id=issue.id, defaults={'count': 1})
-        return Response(status=status.HTTP_201_CREATED)
+
+        appeal_issues = AppealIssues.objects.filter(appeal_id=appeal.id).select_related('issue')
+        appeal_issues_data = AppealIssuesSerializer(appeal_issues, many=True).data
+        return Response({
+            'active_appeal': {'id': appeal.id, 'count': len(appeal_issues_data)},
+            'appeal_issues': appeal_issues_data
+        }, status=status.HTTP_201_CREATED)
     
 
 class UserDetail(APIView):

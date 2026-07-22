@@ -9,9 +9,6 @@ class IssueSerializer(serializers.ModelSerializer):
         model = Issue
         fields = ['id', 'name', 'description', 'image']
 
-# Фронтенд (см. Web_Frontend/src/api/Api.ts, сгенерирован из swagger) ждёт в
-# appeal_issues вложенный объект issue, а не плоский issue_id — иначе
-# AppealIssueCard не может отрисовать название/картинку неисправности.
 class AppealIssuesSerializer(serializers.ModelSerializer):
     issue = IssueSerializer(read_only=True)
     class Meta:
@@ -26,23 +23,15 @@ class AppealSerializer(serializers.ModelSerializer):
     time_created = serializers.DateTimeField(read_only=True)
     time_applied = serializers.DateTimeField(read_only=True)
     time_ended = serializers.DateTimeField(read_only=True)
+    issues = serializers.SerializerMethodField()
 
     class Meta:
         model = Appeal
-        fields = ['id', 'client', 'helper', 'status_id', 'time_created', 'time_applied', 'time_ended', 'connection_code', 'average_work_time']
+        fields = ['id', 'client', 'helper', 'status_id', 'time_created', 'time_applied', 'time_ended', 'connection_code', 'average_work_time', 'issues']
 
-class IssueSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(read_only=True)
-    image = serializers.StringRelatedField(read_only=True)
-    class Meta:
-        model = Issue
-        fields = ['id', 'name', 'description', 'image']
-
-class AppealIssuesSerializer(serializers.ModelSerializer):
-    issue_id = serializers.IntegerField()
-    class Meta:
-        model = AppealIssues
-        fields = ['issue_id', 'count']
+    def get_issues(self, obj):
+        appeal_issues = AppealIssues.objects.filter(appeal_id=obj.id).select_related('issue')
+        return AppealIssuesSerializer(appeal_issues, many=True).data
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
